@@ -1,9 +1,6 @@
 // water_board.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
-
-
 #include <deque> // for bfs
 
 // @return -1 for invalid board
@@ -103,7 +100,6 @@ int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
                 }
 
                 if ( holds_water[ index ] ) {
-                    //std::cout << x << " " << y << std::endl; // #todo
                     ++volume;
                 }
             }
@@ -120,6 +116,7 @@ int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
 #include <array>
 #include <cassert>
 #include <initializer_list>
+#include <iostream>
 #include <vector>
 
 void test_board( int const row_len, int const expected, std::initializer_list< int > rows_in )
