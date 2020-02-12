@@ -1,7 +1,7 @@
 // water_board.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <deque> // for bfs
+#include <deque>   // for bfs
 
 // @return -1 for invalid board
 int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
@@ -13,14 +13,15 @@ int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
 
     int const c_cell_count = num_columns * num_rows;
 
-    int highest_wall = 0;
-    for ( int i = 0; i < c_cell_count; ++i )
-    {   // validate heights and find highest wall
-        if ( p_data[ i ] < 0 ) {
-            return -1;
+    int lowest_ht = p_data[ 0 ];
+    int highest_ht = p_data[ 0 ];
+    for ( int i = 1; i < c_cell_count; ++i )
+    {   // lowest and highest heights
+        if ( p_data[ i ] < lowest_ht ) {
+            lowest_ht = p_data[ i ];
         }
-        if ( p_data[ i ] > highest_wall ) {
-            highest_wall = p_data[ i ];
+        else if ( p_data[ i ] > highest_ht ) {
+            highest_ht = p_data[ i ];
         }
     }
 
@@ -39,7 +40,7 @@ int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
 
     // fill board, one layer at a time
     int volume = 0;
-    for ( int fill_layer = 0; fill_layer < highest_wall; ++fill_layer )
+    for ( int fill_layer = lowest_ht; fill_layer < highest_ht; ++fill_layer )
     {
         // walk inner cells and test for ability to hold water for this layer
         // using a bfs search to attempt to escape the layer from given cell
@@ -64,12 +65,11 @@ int CalcContainedWater( const int *p_data, int num_columns, int num_rows )
                 while ( !queue.empty() )
                 {
                     int const cell_index = queue.front();
-                    int const cell_height = p_data[ cell_index ];
                     queue.pop_front();
 
                     if ( cell_index != index )
                     {
-                        if ( cell_height > fill_layer )
+                        if ( p_data[ cell_index ] > fill_layer )
                         {   // we hit a wall, this path is safe
                             continue;
                         }
@@ -135,18 +135,30 @@ void test_board( int const row_len, int const expected, std::initializer_list< i
         }
         std::cout << "\n";
     }
-    if ( volume >= 0 ) {
-        std::cout << "= " << volume << "\n\n";
-        assert( volume == expected );
-    }
-    else
-    {   // don't stop the rest of the tests
-        std::cout << "= invalid board" << "\n\n";
-    }
+    std::cout << "= " << volume << "\n\n";
+    assert( volume == expected );
 }
 
 int main()
 {
+    test_board( 3, 5, {
+        0, 0, 0,
+        0, -5, 0,
+        0, 0, 0
+    } );
+
+    test_board( 3, 0, {
+        0, 0, 0,
+        0, 0, -1,
+        0, 0, 0
+    } );
+
+    test_board( 5, 4, {
+        -2, -2, 2, 2, 2,
+        -2, -4, 2, 0, 2,
+        -2, -2, 2, 2, 2
+    } );
+
     test_board( 5, 3, {
         1, 1, 1, 1, 1,
         1, 0, 0, 0, 1,
@@ -165,7 +177,7 @@ int main()
         0, 1, 0
     } );
 
-    test_board( 3, 1, {
+    test_board( 3, 2, {
         0, 1, 0,
         1, -1, 1,
         0, 1, 0
